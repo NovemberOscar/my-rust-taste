@@ -1,5 +1,5 @@
 [package]
-name = "rs-grep"
+name = "minigrep"
 version = "0.1.0"
 authors = ["Seonghyeon Kim <kim@seonghyeon.dev>"]
 edition = "2018"
