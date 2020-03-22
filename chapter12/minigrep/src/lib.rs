@@ -1,3 +1,4 @@
+use std::env;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
@@ -16,8 +17,13 @@ impl Config {
 
         let query = args[1].clone();
         let filename = args[2].clone();
+        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
 
-        Ok(Config { query, filename })
+        Ok(Config {
+            query,
+            filename,
+            case_sensitive,
+        })
     }
 }
 
@@ -35,8 +41,6 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     for line in results {
         println!("{}", line);
     }
-
-    println!("With text:\n{}", contents);
 
     Ok(())
 }
