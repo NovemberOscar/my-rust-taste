@@ -1,3 +1,4 @@
+use std::fmt::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::{env, process};
@@ -13,16 +14,22 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.filename);
 
-    run(config);
+    if let Err(e) = run(config) {
+        println!("Something went wrong!:\n{}", e);
+
+        process::exit(1);
+    };
 }
 
-fn run(config: Config) {
+fn run(config: Config) -> Result<(), Box<Error>> {
     let mut f = File::open(config.filename).expect("file not found");
     let mut contents = String::new();
     f.read_to_string(&mut contents)
         .expect("Something went wrong reading the file");
 
     println!("With text:\n{}", contents);
+
+    Ok(())
 }
 
 struct Config {
