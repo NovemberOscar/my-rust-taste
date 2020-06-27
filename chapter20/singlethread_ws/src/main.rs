@@ -18,33 +18,20 @@ fn handle_connection(mut stream: TcpStream) {
 
     let http_get = b"GET / HTTP/1.1\r\n";
 
-    if buffer.starts_with(http_get) {
-        let mut file = File::open(
-            "/Users/k.seonghyeon/Documents/GitHub/my-rust-taste/chapter20/singlethread_ws/src/hello.html",
-        ).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
-
-        let response = format!(
-            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\n{}",
-            contents
-        );
-
-        stream.write(response.as_bytes()).unwrap();
-        stream.flush().unwrap();
+    let (status_line, filename) = if buffer.starts_with(http_get) {
+        ("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\n",
+         "/Users/k.seonghyeon/Documents/GitHub/my-rust-taste/chapter20/singlethread_ws/src/hello.html")
     } else {
-        let mut file = File::open(
-            "/Users/k.seonghyeon/Documents/GitHub/my-rust-taste/chapter20/singlethread_ws/src/404.html",
-        ).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
+        ("HTTP/1.1 404 NOT FOUND\r\nContent-Type: text/html; charset=UTF-8\r\n\n",
+         "/Users/k.seonghyeon/Documents/GitHub/my-rust-taste/chapter20/singlethread_ws/src/404.html")
+    };
 
-        let response = format!(
-            "HTTP/1.1 404 NOT FOUND\r\nContent-Type: text/html; charset=UTF-8\r\n\n{}",
-            contents
-        );
+    let mut file = File::open(filename).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
 
-        stream.write(response.as_bytes()).unwrap();
-        stream.flush().unwrap();
-    }
+    let response = format!("{}{}", status_line, contents);
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
 }
